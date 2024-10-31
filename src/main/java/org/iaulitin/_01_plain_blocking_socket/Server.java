@@ -22,12 +22,10 @@ public class Server {
             doServerWork(clientSocket);
         } catch (IOException e) {
             System.err.println("Could not listen on port: 8080");
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    public static void doServerWork(Socket clientSocket) throws IOException, InterruptedException {
+    public static void doServerWork(Socket clientSocket) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)
         ) {

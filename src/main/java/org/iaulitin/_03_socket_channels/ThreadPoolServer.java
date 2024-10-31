@@ -1,12 +1,17 @@
-package org.iaulitin._02_plain_blocking_socket_thread_per_request;
+package org.iaulitin._03_socket_channels;
 
 import org.iaulitin.Constants;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class ThreadPerRequestServer {
+public class ThreadPoolServer {
+
+    public static final ExecutorService es = Executors.newFixedThreadPool(100);
 
     public static void main(String[] args) {
 
@@ -15,14 +20,14 @@ public class ThreadPerRequestServer {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Accepted connection #" + count++);
-                Thread thread = new Thread(() -> {
+                CompletableFuture.supplyAsync(() -> {
                     try {
                         org.iaulitin._01_plain_blocking_socket.Server.doServerWork(clientSocket);
                     } catch (IOException e) {
                         System.err.println(e.getMessage());
                     }
-                }, "thread-" + count);
-                thread.start();
+                    return null;
+                }, es);
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());

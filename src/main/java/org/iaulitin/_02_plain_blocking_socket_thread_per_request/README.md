@@ -5,7 +5,6 @@ Advantages comparing to previous implementation:
 - we can accept multiple clients simultaneously
 
 This solution still has disadvantages:
-- the calls remained blocking
+- the I/O remained blocking
 - this solution lacks elasticity - it spawns too many threads, enlarges the heap and causing a lot of context switching
   - once the CPU gets overloaded it can stop receiving requests
-- Each particular block 
