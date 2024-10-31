@@ -19,27 +19,30 @@ public class Server {
             Socket clientSocket = serverSocket.accept();
             System.out.println(">>> Someone connected to the socket");
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)
-            ) {
-                System.out.println(">>> Opened I/O streams");
-                String inMessage;
-                while ((inMessage = reader.readLine()) != null) {
-                    if ("END".equals(inMessage)) {
-                        System.out.println(">>> Received a command to terminate the connection from client: \"" + reader.readLine() + "\"");
-                        break;
-                    }
-
-                    System.out.println(">>> Received a message from client: \"" + inMessage + "\"");
-                    String outMessage = StringUtils.reverse(inMessage);
-                    Thread.sleep(900);
-                    writer.println(outMessage);
-                }
-            }
+            doServerWork(clientSocket);
         } catch (IOException e) {
             System.err.println("Could not listen on port: 8080");
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void doServerWork(Socket clientSocket) throws IOException, InterruptedException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)
+        ) {
+            System.out.println(">>> Opened I/O streams");
+            String inMessage;
+            while ((inMessage = reader.readLine()) != null) {
+                if ("END".equals(inMessage)) {
+                    System.out.println(">>> Received a command to terminate the connection from client: \"" + inMessage + "\"");
+                    break;
+                }
+
+                System.out.println(">>> Received a message from client: \"" + inMessage + "\"");
+                String outMessage = StringUtils.reverse(inMessage);
+                writer.println(outMessage);
+            }
         }
     }
 }

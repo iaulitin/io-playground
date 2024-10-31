@@ -24,22 +24,24 @@ public class Client {
      * @param args
      */
     public static void main(String[] args) {
-        try (Socket socket = new Socket("localhost", Constants.SERVER_PORT);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
+        try (Socket clientSocket = new Socket("localhost", Constants.SERVER_PORT)) {
+            clientSocket.setSoTimeout(SOCKET_TIMEOUT_MS);
+            doClientWork(clientSocket);
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-            socket.setSoTimeout(2000);
+    public static void doClientWork(Socket clientSocket) throws IOException, InterruptedException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)) {
 
             for (String message : MESSAGES) {
                 writer.println(message);
                 System.out.println(">>> Sent to server: \"" + message + "\"");
                 System.out.println(">>> Blocking while waiting for a server response...");
                 System.out.println(">>> Received a response from server: \"" + reader.readLine() + "\"");
-                Thread.sleep(1000);
             }
-
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 }
